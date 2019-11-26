@@ -75,6 +75,27 @@ SOFTWARE.
 // OE/LED: PA8
 #define OE_OUT(d)       PAO(8) = (d)
 #endif
+
+#elif defined(ARMJISHU)
+// TCK: PA0 (MCU-TCK)
+#define TCK_OUT(d)      PAO(0) = (d)
+#define TCK_0()         TCK_OUT(0)
+#define TCK_1()         TCK_OUT(1)
+
+// TDO: PA6 (MCU-TDO)
+#define TDO_IN()        PAI(6)
+
+// TDI: PA4 (MCU-TDI)
+#define TDI_OUT(d)      PAO(4) = (d)
+
+// TMS: PA1 (MCU-TMS)
+#define TMS_OUT(d)      PAO(1) = (d)
+
+#ifdef BLASTER_OE_LED_EN
+// OE/LED: PA5
+#define OE_OUT(d)       PAO(5) = (d)
+#endif
+
 #else
 #error Unknown platform
 #endif
@@ -126,6 +147,30 @@ void bport_init(void)
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
+#elif defined(ARMJISHU)
+    // GPIO Out Configuration: TCK(PA0), TDI(PA4), TMS(PA1), nSRST(PA2), nTRST(PA3)
+    GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_0 | GPIO_Pin_4 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    PAO(2) = 1;		// negate nSRST
+    PAO(3) = 1;		// negate nTRST
+
+    // GPIO In Configuration: TDO(PA6)
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    // GPIO Out Configuration: USB PULL UP(PB6)
+    GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_6;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+    PBO(6) = 1;		// enable USB pullup
+
+#else
+#error blaster_port.c no defined blaster type
+
 #endif
 
 #ifdef BLASTER_OE_LED_EN

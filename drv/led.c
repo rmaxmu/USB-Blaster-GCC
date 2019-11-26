@@ -63,6 +63,9 @@ static uint16_t s_led_cycle_cnt;
 #elif defined(STLINK_V2_CLONE_DONGLE)
 #define LED_ON()	GPIOA->BSRR = GPIO_Pin_9
 #define LED_OFF()	GPIOA->BRR = GPIO_Pin_9
+#elif defined(ARMJISHU)
+#define LED_OFF()        GPIOA->BSRR = GPIO_Pin_5
+#define LED_ON()       GPIOA->BRR = GPIO_Pin_5
 #endif
 
 // LED¶Ë¿Ú³õÊ¼»¯
@@ -86,6 +89,17 @@ static void led_gpio_config(void)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
+#elif defined(ARMJISHU)
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+
+    // GPIOA Configuration: Pin 13
+    GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_5;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+#else
+#error led.c no defined blaster type
+
 #endif
 }
 
